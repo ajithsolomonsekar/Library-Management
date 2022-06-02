@@ -2,14 +2,14 @@ package com.ajithsolomon.librarymanagement.entity;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @Entity
-public class Book {
+@Table(
+        name = "books",
+        uniqueConstraints = @UniqueConstraint(name = "uc_books", columnNames = {"id", "isbn"}))
+public class Books {
     @Id
     @GeneratedValue
     private Long id;
@@ -28,4 +28,8 @@ public class Book {
 
     @Column
     private String edition;
+
+    @Column(nullable = false)
+    private Boolean available;
+
 }

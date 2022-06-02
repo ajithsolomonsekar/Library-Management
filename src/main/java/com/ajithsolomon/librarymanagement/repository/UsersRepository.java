@@ -1,9 +1,9 @@
 package com.ajithsolomon.librarymanagement.repository;
 
-import com.ajithsolomon.librarymanagement.entity.Books;
+import com.ajithsolomon.librarymanagement.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BookRepository extends JpaRepository<Books, Long> {
+public interface UsersRepository extends JpaRepository<Users, Long> {
 }
