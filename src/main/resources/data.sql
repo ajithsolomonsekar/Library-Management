@@ -13,5 +13,8 @@ values (4L, '9780008453510', 'The Keeper of Stories', 'Sally Page', 'One More Ch
 INSERT INTO BOOKS (id, isbn, name, author, publisher, edition, available)
 values (5L, '9781786580856', 'Songbirds', 'Christy Lefteri', 'Manilla Press', '2022', true);
 
+INSERT INTO BOOKS (id, isbn, name, author, publisher, edition, available)
+values (6L, '9781786580856', 'Songbirds', 'Christy Lefteri', 'Manilla Press', '2022', true);
+
 INSERT INTO USERS (id, username, password) values (01, 'user01', 'password01');
 INSERT INTO USERS (id, username, password) values (02, 'user02', 'password02');

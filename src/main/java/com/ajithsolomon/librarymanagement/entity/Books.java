@@ -8,13 +8,13 @@ import javax.persistence.*;
 @Entity
 @Table(
         name = "books",
-        uniqueConstraints = @UniqueConstraint(name = "uc_books", columnNames = {"id", "isbn"}))
+        uniqueConstraints = @UniqueConstraint(name = "uc_books", columnNames = {"id"}))
 public class Books {
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String isbn;
 
     @Column(nullable = false)
