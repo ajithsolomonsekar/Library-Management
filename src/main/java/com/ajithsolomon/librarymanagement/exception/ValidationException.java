@@ -10,17 +10,13 @@ import java.util.List;
 public class ValidationException extends Exception {
 
     private static final long serialVersionUID = 1987130135699527245L;
-
     private final List<String> errors = new ArrayList<>();
-
     public ValidationException(String error) {
         addErrors(error);
     }
-
     public void addErrors(String error) {
         errors.add(error);
     }
-
     public String getMessageAsString() {
         return String.join(", ", errors);
     }

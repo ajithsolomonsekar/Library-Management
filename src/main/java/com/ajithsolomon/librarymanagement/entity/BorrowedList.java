@@ -15,11 +15,11 @@ public class BorrowedList {
     @GeneratedValue
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "usersId", referencedColumnName = "id")
     private Users users;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "booksId", referencedColumnName = "id", unique = true)
     private Books books;
 

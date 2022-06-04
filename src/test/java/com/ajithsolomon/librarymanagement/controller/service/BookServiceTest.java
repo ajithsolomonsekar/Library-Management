@@ -6,6 +6,7 @@ import com.ajithsolomon.librarymanagement.entity.Users;
 import com.ajithsolomon.librarymanagement.exception.EntityNotFoundException;
 import com.ajithsolomon.librarymanagement.exception.ValidationException;
 import com.ajithsolomon.librarymanagement.model.BorrowBookRequest;
+import com.ajithsolomon.librarymanagement.model.ReturnBookRequest;
 import com.ajithsolomon.librarymanagement.repository.BookRepository;
 import com.ajithsolomon.librarymanagement.repository.BorrowedListRepository;
 import com.ajithsolomon.librarymanagement.repository.UsersRepository;
@@ -13,8 +14,6 @@ import com.ajithsolomon.librarymanagement.service.BookService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
@@ -82,7 +81,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void borrowTwoBookFromLibraryTest() throws Exception {
+    public void borrowSecondBookFromLibraryTest() throws Exception {
 
         BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
         borrowBookRequest.setBookId(3L);
@@ -95,7 +94,7 @@ public class BookServiceTest {
 
         Books book1 = new Books();
         book1.setId(2L);
-        book1.setAvailable(true);
+        book1.setAvailable(false);
         book1.setName("The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
@@ -132,14 +131,14 @@ public class BookServiceTest {
 
         Books book1 = new Books();
         book1.setId(2L);
-        book1.setAvailable(true);
+        book1.setAvailable(false);
         book1.setName("The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
         Books book2 = new Books();
         book2.setId(3L);
-        book2.setAvailable(true);
-        book2.setName("The Keeper of Stories");
+        book2.setAvailable(false);
+        book2.setName("Stories");
         book2.setIsbn("9781838770013");
 
         Books book3 = new Books();
@@ -172,7 +171,7 @@ public class BookServiceTest {
     }
 
     @Test
-    public void borrowTwoCopyOfSameBookReturnExceptionTest() throws EntityNotFoundException{
+    public void borrowSecondCopyOfSameBookReturnExceptionTest() throws EntityNotFoundException{
         BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
         borrowBookRequest.setBookId(6L);
         borrowBookRequest.setUserId(2L);
@@ -184,7 +183,7 @@ public class BookServiceTest {
 
         Books book1 = new Books();
         book1.setId(5L);
-        book1.setAvailable(true);
+        book1.setAvailable(false);
         book1.setName("The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
@@ -210,9 +209,75 @@ public class BookServiceTest {
         catch (ValidationException validationException){
             Assertions.assertEquals("Only one copy of a book can be borrowed by the User",validationException.getMessageAsString());
         }
-
-
     }
 
+    @Test
+    public void returnOneBookToLibraryTest() {
+        ReturnBookRequest returnBookRequest = new ReturnBookRequest();
+        returnBookRequest.setUserId(2L);
+        returnBookRequest.setBookIdArray(new Long[]{4L});
+
+        Users user = new Users();
+        user.setId(2L);
+        user.setUsername("user02");
+        user.setPassword("password02");
+
+        Books book = new Books();
+        book.setId(4L);
+        book.setAvailable(false);
+        book.setName("The Keeper of Stories");
+        book.setIsbn("9780008453510");
+
+        BorrowedList borrowedList = new BorrowedList();
+        borrowedList.setId(1L);
+        borrowedList.setBooks(book);
+        borrowedList.setUsers(user);
+        borrowedList.setIssuedDate(LocalDateTime.now().toString());
+
+        when(borrowedListRepository.findByUsersId(2L)).thenReturn(Set.of(borrowedList));
+        when(bookRepository.findById(4L)).thenReturn(Optional.of(book));
+        bookService.returnBook(returnBookRequest);
+    }
+
+    @Test
+    public void returnTwoBooksToLibraryTest() {
+        ReturnBookRequest returnBookRequest = new ReturnBookRequest();
+        returnBookRequest.setUserId(2L);
+        returnBookRequest.setBookIdArray(new Long[]{4L});
+
+        Users user = new Users();
+        user.setId(2L);
+        user.setUsername("user02");
+        user.setPassword("password02");
+
+        Books book1 = new Books();
+        book1.setId(4L);
+        book1.setAvailable(false);
+        book1.setName("The Keeper of Stories");
+        book1.setIsbn("9780008453510");
+
+        Books book2 = new Books();
+        book2.setId(5L);
+        book2.setAvailable(false);
+        book2.setName("Songbirds");
+        book2.setIsbn("9781566199094");
+
+        BorrowedList borrowedList1 = new BorrowedList();
+        borrowedList1.setId(1L);
+        borrowedList1.setBooks(book1);
+        borrowedList1.setUsers(user);
+        borrowedList1.setIssuedDate(LocalDateTime.now().toString());
+
+        BorrowedList borrowedList2 = new BorrowedList();
+        borrowedList2.setId(2L);
+        borrowedList2.setBooks(book2);
+        borrowedList2.setUsers(user);
+        borrowedList2.setIssuedDate(LocalDateTime.now().toString());
+
+        when(borrowedListRepository.findByUsersId(2L)).thenReturn(Set.of(borrowedList1, borrowedList2));
+        when(bookRepository.findById(4L)).thenReturn(Optional.of(book1));
+        when(bookRepository.findById(5L)).thenReturn(Optional.of(book2));
+        bookService.returnBook(returnBookRequest);
+    }
 
 }

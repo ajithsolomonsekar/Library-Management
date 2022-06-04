@@ -4,6 +4,7 @@ import com.ajithsolomon.librarymanagement.entity.Books;
 import com.ajithsolomon.librarymanagement.exception.EntityNotFoundException;
 import com.ajithsolomon.librarymanagement.exception.ValidationException;
 import com.ajithsolomon.librarymanagement.model.BorrowBookRequest;
+import com.ajithsolomon.librarymanagement.model.ReturnBookRequest;
 import com.ajithsolomon.librarymanagement.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,14 +27,20 @@ public class BookController {
 
     @GetMapping("/books")
     public ResponseEntity<List<Books>> findAllBooks() {
-        List<Books> allBooks = bookService.findAllBooks();
-        return new ResponseEntity<>(allBooks, HttpStatus.OK);
+        return new ResponseEntity<>(bookService.findAllBooks(), HttpStatus.OK);
     }
 
     @PatchMapping("/borrow-book")
     public ResponseEntity<Void> borrowBook(@RequestBody @Valid BorrowBookRequest borrowBookRequest)
             throws ValidationException, EntityNotFoundException {
         bookService.borrowBook(borrowBookRequest);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/return-book")
+    public ResponseEntity<Void> returnBook(@RequestBody @Valid ReturnBookRequest returnBookRequest)
+            throws ValidationException {
+        bookService.returnBook(returnBookRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
