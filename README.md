@@ -76,19 +76,19 @@ GET **http://localhost:8080/library-management/v1/books**
 PATCH **http://localhost:8080/library-management/v1/borrow-book**
 
 Request Body:
-{
+**{
     "userId": 2,
     "bookId": 6
-}
+}**
 
 #### To return books to the library
 PATCH **http://localhost:8080/library-management/v1/return-book**
 
 Request Body:
-{
+**{
     "userId": 2,
     "bookIdArray": [4, 6]
-}
+}**
 
 ## Swagger Documentation
 
