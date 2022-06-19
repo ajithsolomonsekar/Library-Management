@@ -9,7 +9,7 @@
 
 # Library-Management
 
-[Spring Boot](http://projects.spring.io/spring-boot/) application that exposed REST API for below functionalities:
+[Spring Boot](http://projects.spring.io/spring-boot/) application that exposed REST API for below functionalities developed in TDD process
 
 * User can view books in library
 * User can borrow a book from the library
