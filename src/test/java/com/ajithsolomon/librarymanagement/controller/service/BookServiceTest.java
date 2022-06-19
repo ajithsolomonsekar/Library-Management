@@ -41,37 +41,26 @@ public class BookServiceTest {
 
     @Test
     public void findAllBooksTest(){
-
-        Books book1 = new Books();
-        book1.setId(1L);
-        book1.setAvailable(true);
-        book1.setName("The Keeper of Stories");
-
-        Books book2 = new Books();
-        book2.setId(2L);
-        book2.setAvailable(false);
-        book2.setName("Keepers");
-
+        Books book1 = getBook1(1L, true, "The Keeper of Stories");
+        Books book2 = getBook1(2L, false, "Keepers");
         when(bookRepository.findAll()).thenReturn(List.of(book1, book2));
         bookService.findAllBooks();
     }
 
+    private Books getBook1(long id, boolean available, String The_Keeper_of_Stories) {
+        Books book1 = new Books();
+        book1.setId(id);
+        book1.setAvailable(available);
+        book1.setName(The_Keeper_of_Stories);
+        return book1;
+    }
+
     @Test
     public void borrowOneBookFromLibraryTest() throws Exception {
+        BorrowBookRequest borrowBookRequest = getBorrowBookRequest(2L, 1L);
 
-        BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
-        borrowBookRequest.setBookId(2L);
-        borrowBookRequest.setUserId(1L);
-
-        Users user = new Users();
-        user.setId(1L);
-        user.setUsername("user01");
-        user.setPassword("password01");
-
-        Books book = new Books();
-        book.setId(2L);
-        book.setAvailable(true);
-        book.setName("The Keeper of Stories");
+        Users user = getUser(1L, "user01", "password01");
+        Books book = getBook1(2L, true, "The Keeper of Stories");
 
         when(usersRepository.findById(1L)).thenReturn(Optional.of(user));
         when(bookRepository.findById(2L)).thenReturn(Optional.of(book));
@@ -80,28 +69,31 @@ public class BookServiceTest {
         bookService.borrowBook(borrowBookRequest);
     }
 
+    private BorrowBookRequest getBorrowBookRequest(long bookId, long userId) {
+        BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
+        borrowBookRequest.setBookId(bookId);
+        borrowBookRequest.setUserId(userId);
+        return borrowBookRequest;
+    }
+
+    private Users getUser(long id, String user01, String password01) {
+        Users user = new Users();
+        user.setId(id);
+        user.setUsername(user01);
+        user.setPassword(password01);
+        return user;
+    }
+
     @Test
     public void borrowSecondBookFromLibraryTest() throws Exception {
+        BorrowBookRequest borrowBookRequest = getBorrowBookRequest(3L, 1L);
 
-        BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
-        borrowBookRequest.setBookId(3L);
-        borrowBookRequest.setUserId(1L);
+        Users user = getUser(1L, "user01", "password01");
 
-        Users user = new Users();
-        user.setId(1L);
-        user.setUsername("user01");
-        user.setPassword("password01");
-
-        Books book1 = new Books();
-        book1.setId(2L);
-        book1.setAvailable(false);
-        book1.setName("The Keeper of Stories");
+        Books book1 = getBook1(2L, false, "The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
-        Books book2 = new Books();
-        book2.setId(3L);
-        book2.setAvailable(true);
-        book2.setName("Mayo's Famous Son");
+        Books book2 = getBook1(3L, true, "Mayo's Famous Son");
         book2.setIsbn("9781838770013");
 
         when(usersRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -113,53 +105,30 @@ public class BookServiceTest {
         borrowedList.setIssuedDate(LocalDateTime.now().toString());
 
         when(borrowedListRepository.findByUsersId(1L)).thenReturn(Set.of(borrowedList));
-
         bookService.borrowBook(borrowBookRequest);
     }
 
     @Test
     public void borrowThirdBookReturnExceptionTest() throws EntityNotFoundException {
 
-        BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
-        borrowBookRequest.setBookId(4L);
-        borrowBookRequest.setUserId(1L);
+        BorrowBookRequest borrowBookRequest = getBorrowBookRequest(4L, 1L);
 
-        Users user = new Users();
-        user.setId(1L);
-        user.setUsername("user01");
-        user.setPassword("password01");
+        Users user = getUser(1L, "user01", "password01");
 
-        Books book1 = new Books();
-        book1.setId(2L);
-        book1.setAvailable(false);
-        book1.setName("The Keeper of Stories");
+        Books book1 = getBook1(2L, false, "The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
-        Books book2 = new Books();
-        book2.setId(3L);
-        book2.setAvailable(false);
-        book2.setName("Stories");
+        Books book2 = getBook1(3L, false, "Stories");
         book2.setIsbn("9781838770013");
 
-        Books book3 = new Books();
-        book3.setId(4L);
-        book3.setAvailable(true);
-        book3.setName("Songbirds");
+        Books book3 = getBook1(4L, true, "Songbirds");
         book3.setIsbn("9781566199094");
 
         when(usersRepository.findById(1L)).thenReturn(Optional.of(user));
         when(bookRepository.findById(4L)).thenReturn(Optional.of(book3));
-        BorrowedList borrowedList1 = new BorrowedList();
-        borrowedList1.setId(1L);
-        borrowedList1.setBooks(book1);
-        borrowedList1.setUsers(user);
-        borrowedList1.setIssuedDate(LocalDateTime.now().toString());
+        BorrowedList borrowedList1 = getBorrowedList(1L, book1, user);
 
-        BorrowedList borrowedList2 = new BorrowedList();
-        borrowedList2.setId(2L);
-        borrowedList2.setBooks(book2);
-        borrowedList2.setUsers(user);
-        borrowedList2.setIssuedDate(LocalDateTime.now().toString());
+        BorrowedList borrowedList2 = getBorrowedList(2L, book2, user);
 
         when(borrowedListRepository.findByUsersId(1L)).thenReturn(Set.of(borrowedList1, borrowedList2));
         try{
@@ -170,37 +139,31 @@ public class BookServiceTest {
         }
     }
 
+    private BorrowedList getBorrowedList(long id, Books book1, Users user) {
+        BorrowedList borrowedList1 = new BorrowedList();
+        borrowedList1.setId(id);
+        borrowedList1.setBooks(book1);
+        borrowedList1.setUsers(user);
+        borrowedList1.setIssuedDate(LocalDateTime.now().toString());
+        return borrowedList1;
+    }
+
     @Test
     public void borrowSecondCopyOfSameBookReturnExceptionTest() throws EntityNotFoundException{
-        BorrowBookRequest borrowBookRequest = new BorrowBookRequest();
-        borrowBookRequest.setBookId(6L);
-        borrowBookRequest.setUserId(2L);
+        BorrowBookRequest borrowBookRequest = getBorrowBookRequest(6L, 2L);
 
-        Users user = new Users();
-        user.setId(2L);
-        user.setUsername("user02");
-        user.setPassword("password02");
+        Users user = getUser(2L, "user02", "password02");
 
-        Books book1 = new Books();
-        book1.setId(5L);
-        book1.setAvailable(false);
-        book1.setName("The Keeper of Stories");
+        Books book1 = getBook1(5L, false, "The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
-        Books book2 = new Books();
-        book2.setId(6L);
-        book2.setAvailable(true);
-        book2.setName("The Keeper of Stories");
+        Books book2 = getBook1(6L, true, "The Keeper of Stories");
         book2.setIsbn("9780008453510");
 
         when(usersRepository.findById(2L)).thenReturn(Optional.of(user));
         when(bookRepository.findById(6L)).thenReturn(Optional.of(book2));
 
-        BorrowedList borrowedList = new BorrowedList();
-        borrowedList.setId(1L);
-        borrowedList.setBooks(book1);
-        borrowedList.setUsers(user);
-        borrowedList.setIssuedDate(LocalDateTime.now().toString());
+        BorrowedList borrowedList = getBorrowedList(1L, book1, user);
 
         when(borrowedListRepository.findByUsersId(2L)).thenReturn(Set.of(borrowedList));
         try{
@@ -213,66 +176,41 @@ public class BookServiceTest {
 
     @Test
     public void returnOneBookToLibraryTest() {
-        ReturnBookRequest returnBookRequest = new ReturnBookRequest();
-        returnBookRequest.setUserId(2L);
-        returnBookRequest.setBookIdArray(new Long[]{4L});
+        ReturnBookRequest returnBookRequest = getReturnBookRequest();
 
-        Users user = new Users();
-        user.setId(2L);
-        user.setUsername("user02");
-        user.setPassword("password02");
+        Users user = getUser(2L, "user02", "password02");
 
-        Books book = new Books();
-        book.setId(4L);
-        book.setAvailable(false);
-        book.setName("The Keeper of Stories");
+        Books book = getBook1(4L, false, "The Keeper of Stories");
         book.setIsbn("9780008453510");
 
-        BorrowedList borrowedList = new BorrowedList();
-        borrowedList.setId(1L);
-        borrowedList.setBooks(book);
-        borrowedList.setUsers(user);
-        borrowedList.setIssuedDate(LocalDateTime.now().toString());
+        BorrowedList borrowedList = getBorrowedList(1L, book, user);
 
         when(borrowedListRepository.findByUsersId(2L)).thenReturn(Set.of(borrowedList));
         when(bookRepository.findById(4L)).thenReturn(Optional.of(book));
         bookService.returnBook(returnBookRequest);
     }
 
-    @Test
-    public void returnTwoBooksToLibraryTest() {
+    private ReturnBookRequest getReturnBookRequest() {
         ReturnBookRequest returnBookRequest = new ReturnBookRequest();
         returnBookRequest.setUserId(2L);
         returnBookRequest.setBookIdArray(new Long[]{4L});
+        return returnBookRequest;
+    }
 
-        Users user = new Users();
-        user.setId(2L);
-        user.setUsername("user02");
-        user.setPassword("password02");
+    @Test
+    public void returnTwoBooksToLibraryTest() {
+        ReturnBookRequest returnBookRequest = getReturnBookRequest();
 
-        Books book1 = new Books();
-        book1.setId(4L);
-        book1.setAvailable(false);
-        book1.setName("The Keeper of Stories");
+        Users user = getUser(2L, "user02", "password02");
+
+        Books book1 = getBook1(4L, false, "The Keeper of Stories");
         book1.setIsbn("9780008453510");
 
-        Books book2 = new Books();
-        book2.setId(5L);
-        book2.setAvailable(false);
-        book2.setName("Songbirds");
+        Books book2 = getBook1(5L, false, "Songbirds");
         book2.setIsbn("9781566199094");
 
-        BorrowedList borrowedList1 = new BorrowedList();
-        borrowedList1.setId(1L);
-        borrowedList1.setBooks(book1);
-        borrowedList1.setUsers(user);
-        borrowedList1.setIssuedDate(LocalDateTime.now().toString());
-
-        BorrowedList borrowedList2 = new BorrowedList();
-        borrowedList2.setId(2L);
-        borrowedList2.setBooks(book2);
-        borrowedList2.setUsers(user);
-        borrowedList2.setIssuedDate(LocalDateTime.now().toString());
+        BorrowedList borrowedList1 = getBorrowedList(1L, book1, user);
+        BorrowedList borrowedList2 = getBorrowedList(2L, book2, user);
 
         when(borrowedListRepository.findByUsersId(2L)).thenReturn(Set.of(borrowedList1, borrowedList2));
         when(bookRepository.findById(4L)).thenReturn(Optional.of(book1));
